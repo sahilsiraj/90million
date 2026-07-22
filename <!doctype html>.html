@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FIRST OF MILLIONS — 90Million</title>
+  <meta name="description" content="You unlocked an exclusive invite to 90Million's soft launch. Reserve your seat for the First of Millions guest experience.">
+  <meta property="og:title" content="FIRST OF MILLIONS — 90Million">
+  <meta property="og:description" content="You unlocked an exclusive invite to 90Million's soft launch. Reserve your seat for the First of Millions guest experience.">
+
+  <style>
+    /* Minimal, classy — fits brand voice: witty-classy, minimal */
+    :root{--bg:#fff;--muted:#7b7b7b;--accent:#111;--card:#faf9f7;--success:#0b8a4a}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial; margin:0;color:var(--accent);background:linear-gradient(180deg,#fff,#fbfbfb);}
+    .wrap{max-width:720px;margin:6vh auto;padding:28px}
+    .card{background:var(--card);padding:28px;border-radius:12px;box-shadow:0 6px 18px rgba(12,12,12,0.06)}
+    header{display:flex;align-items:center;gap:14px}
+    .logo{width:56px;height:56px;border-radius:10px;background:#111;color:#fff;display:grid;place-items:center;font-weight:700}
+    h1{margin:0;font-size:22px;letter-spacing:0.02em}
+    p.lead{color:var(--muted);margin-top:10px}
+    form{margin-top:18px;display:grid;gap:12px}
+    label{font-size:13px;color:var(--muted)}
+    input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #e6e6e6;font-size:15px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .cta{display:flex;gap:8px;align-items:center}
+    button{background:#111;color:#fff;padding:12px 16px;border-radius:10px;border:0;font-weight:600;cursor:pointer}
+    .secondary{background:transparent;color:var(--accent);border:1px solid #e6e6e6}
+    small{color:var(--muted)}
+    footer{margin-top:14px;color:var(--muted);font-size:13px}
+    .muted{color:var(--muted);font-size:13px}
+    .success{display:none;padding:18px;border-radius:10px;background:#eef9f2;color:var(--success);margin-top:12px}
+    @media(max-width:640px){.wrap{margin:4vh 18px;padding:18px}.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo">90M</div>
+        <div>
+          <h1>Welcome, First of Millions.</h1>
+          <p class="lead">You’ve unlocked an invite to our exclusive soft launch. Reserve your seat — spaces are limited.</p>
+        </div>
+      </header>
+
+      <form id="rsvp" autocomplete="off">
+        <div>
+          <label for="name">Full name</label>
+          <input id="name" name="name" placeholder="How should we call you?" required>
+        </div>
+
+        <div>
+          <label for="contact">Contact (phone or email) — optional but helps us confirm</label>
+          <input id="contact" name="contact" placeholder="+91 98xxxx or name@example.com">
+        </div>
+
+        <div>
+          <label for="slot">Preferred slot</label>
+          <select id="slot" name="slot" required>
+            <option value="">Choose a slot — limited seats</option>
+            <option>Saturday, 10:00 — 11:30 (Preview)</option>
+            <option>Saturday, 15:00 — 16:30 (Preview)</option>
+            <option>Sunday, 10:00 — 11:30 (Preview)</option>
+            <option>Sunday, 15:00 — 16:30 (Preview)</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="guests">Guests (max 1 additional)</label>
+            <select id="guests" name="guests">
+              <option value="0">Just me</option>
+              <option value="1">+1 guest</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="notes">Anything we should know? (allergies/diet)</label>
+            <input id="notes" name="notes" placeholder="e.g. nut allergy">
+          </div>
+        </div>
+
+        <div class="cta">
+          <button type="submit">🔒 Claim Your Spot</button>
+          <button type="button" class="secondary" id="follow">Follow us on Instagram</button>
+        </div>
+
+        <div class="success" id="successBox">
+          <strong>You're in.</strong>
+          <div class="muted">We’ll reach out with your exclusive invite. Keep an eye on your messages.</div>
+        </div>
+
+        <footer>
+          <small>By reserving, you agree to receive a one-time message about your invite. We respect your privacy.</small>
+        </footer>
+      </form>
+
+    </div>
+
+    <div style="text-align:center;margin-top:18px;color:var(--muted)">
+      <small>Pro tip: bring this card on the day to make check-in faster.</small>
+    </div>
+  </main>
+
+  <script>
+    // Integration notes:
+    // 1) Replace SUBMIT_ENDPOINT with your serverless function or form endpoint (Netlify Forms, Formspree, Zapier webhook etc.)
+    // 2) If using Netlify Forms: add a hidden input <input type="hidden" name="form-name" value="first-of-millions"> and enable Netlify.
+    // 3) This script will try to POST JSON to SUBMIT_ENDPOINT. The dev should return 200/201 for success.
+
+    const SUBMIT_ENDPOINT = 'https://example.com/api/reservations'; // <-- replace with real endpoint
+
+    document.getElementById('follow').addEventListener('click', ()=>{
+      window.open('https://instagram.com/90millioncoffee', '_blank');
+    });
+
+    document.getElementById('rsvp').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true; btn.textContent = 'Sending...';
+
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        slot: document.getElementById('slot').value,
+        guests: document.getElementById('guests').value,
+        notes: document.getElementById('notes').value.trim(),
+        source: 'FIRST_OF_MILLIONS_QR'
+      };
+
+      try{
+        // optimistic local success if endpoint not configured
+        const resp = await fetch(SUBMIT_ENDPOINT, {
+          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+        });
+        if(!resp.ok){ throw new Error('server error') }
+
+        document.getElementById('successBox').style.display = 'block';
+        e.target.reset();
+        btn.textContent = 'Claim Your Spot'; btn.disabled = false;
+
+      }catch(err){
+        // fallback: store in localStorage and show message to contact via WhatsApp
+        console.warn('submit failed — fallback active',err);
+        localStorage.setItem('firstOfMillions_pending', JSON.stringify(payload));
+        document.getElementById('successBox').style.display = 'block';
+        document.getElementById('successBox').querySelector('.muted').innerText = 'Looks like we couldn\'t reach our server. We saved your request locally — send us a quick WhatsApp at +91-XXXXXXXXXX with the subject FIRST OF MILLIONS to confirm.';
+        btn.textContent = 'Claim Your Spot'; btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+
+<!--
+IMPLEMENTATION / NEXT STEPS (copy for developer / Tiny Turtle / you):
+1) Hosting: deploy as a single HTML page on Netlify / Vercel / your existing Netlify site. Use path /firstofmillions and keep it unlinked.
+   - Netlify Forms: add <form name="first-of-millions" data-netlify="true"> and remove JS POST (or keep both and use fetch to a Netlify function).
+   - Alternatively use Formspree / Getform / Google Forms with Zapier.
+
+2) Data & confirmations:
+   - Use a webhook (Zapier/Make) to push form submissions to a Google Sheet and trigger a WhatsApp or SMS via Twilio/Routes.
+   - Use the contact field (optional) to send a one-time confirmation + unique invite code.
+
+3) QR card printing:
+   - Generate a QR that points to the absolute URL: https://90million.in/firstofmillions
+   - Track QR scans using a short redirect (e.g., go.90million.in/fofm -> logs, then 302 to final page) for analytics.
+
+4) Capacity control:
+   - Run 3–4 seatings per weekend, cap at 12–20 guests/slot. Use Google Sheet to live-update seat counts OR build a small backend that decrements availability.
+
+5) Check-in flow:
+   - On day, staff checks guest list (search by name/contact), verify card or QR; mark present in sheet.
+   - Keep a standby list for no-shows.
+
+6) Communication templates (WhatsApp/SMS):
+   - Confirmation: "You’re in! Your invite to 90Million soft launch — [date/time]. Show this message at check-in. Reply 1 to confirm."
+   - Reminder (24 hours): "Reminder: Your 90Million preview is tomorrow at [time]. We have a small treat waiting. Reply 1 to confirm."
+
+7) Post-event follow-up:
+   - Send a thank you message with 10% coupon for first official visit and request an honest review.
+
+8) Analytics & measurement:
+   - Track QR scans, form conversions, show-rate (attended / reserved), and LTV of returning guests.
+
+9) Security & spam:
+   - CAPTCHA or simple email/phone verification if spam becomes an issue.
+
+-->
